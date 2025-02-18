@@ -19,13 +19,32 @@ class Evento(models.Model):
     ubicacion = models.CharField(max_length=255, blank=True, null=True)  # New field
     precio = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)  # New field
     created_at = models.DateTimeField(auto_now_add=True)  # Asegúrate de que esto esté definido
-    
-
-    def __str__(self):
-        return self.nombre
+    qr_code = models.ImageField(upload_to='qrcodes/', blank=True, null=True)  # New field
 
     def get_absolute_url(self):
-        return reverse("evento_detalle", args=[str(self.id)])
+        return reverse("evento_detalle", kwargs={"evento_id": self.pk})
+    
+    
+    def save(self, *args, **kwargs):
+        # Save the event first to get the primary key
+        super().save(*args, **kwargs)
+
+        if not self.qr_code:
+            # Generate the correct URL using the saved object's primary key
+            base_url = "https://localhost:8000" #https://bedb61e9-32da-4a32-bb6a-c73727f76e32-00-w7mo7nsuhuf.picard.replit.dev"  # Change for deployment
+            url = f"{base_url}{self.get_absolute_url()}"
+
+            # Generate the QR code
+            qr = qrcode.make(url)
+            buffer = BytesIO()
+            qr.save(buffer, format='PNG')
+
+            # Save the QR code to the qr_code field
+            filename = f'qr_{self.pk}.png'  # Use pk instead of id
+            self.qr_code.save(filename, ContentFile(buffer.getvalue()), save=False)
+
+            # Save again to store the QR code
+            super().save(*args, **kwargs)
 
 
 class Entrada(models.Model):

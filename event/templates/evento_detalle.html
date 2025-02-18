@@ -19,7 +19,14 @@
                 <p class="card-text">{{ evento.descripcion }}</p>
                 <p class="card-text"><strong>Fecha:</strong> {{ evento.fecha }}</p>
                 <p class="card-text"><strong>Ubicación:</strong> {{ evento.ubicacion }}</p>
-                <p class="card-text"><strong>Precio:</strong> ${{ evento.precio }}</p>  <!-- Display the price -->
+                <p class="card-text"><strong>Precio:</strong> ${{ evento.precio }}</p>
+
+                <!-- Display the QR code -->
+                <div class="mt-4">
+                    <h3>QR Code para este evento</h3>
+                    <img src="{{ evento.qr_code.url }}" class="img-fluid" alt="QR Code">
+                </div>
+
                 <hr>
                 <h3>Reservar Entrada</h3>
                 <form method="post">
