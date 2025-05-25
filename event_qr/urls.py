@@ -20,4 +20,6 @@ from django.urls import path, include
 urlpatterns = [
     path("admin/", admin.site.urls),
     path('', include('event.urls')),  # Incluye las rutas definidas en event/urls.py
+    path('users/', include('users.urls')), # Incluye las rutas de la app users
+    path('marketplace/', include('marketplace.urls')), # Incluye las rutas de la app marketplace
 ]

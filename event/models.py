@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User # Import User model
 import uuid
 import qrcode
 from phonenumber_field.modelfields import PhoneNumberField
@@ -11,6 +12,7 @@ class Evento(models.Model):
     #id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     id = models.AutoField(primary_key=True)  # Mantén el ID numérico para evitar errores
     uuid_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    creator = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='created_events')
     nombre = models.CharField(max_length=200)
     fecha = models.DateTimeField()
     aforo = models.IntegerField()

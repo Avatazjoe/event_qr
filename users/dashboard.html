@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>My Dashboard</h2>
+  
+  <h3>My Events</h3>
+  {% if user_events %}
+    <ul>
+      {% for event in user_events %}
+        <li>
+          <a href="{% url 'evento_detalle' event.uuid_id %}">{{ event.nombre }}</a>
+          (Created: {{ event.created_at|date:"d M Y H:i" }})
+          {% if event.qr_code %}
+            <img src="{{ event.qr_code.url }}" alt="QR Code for {{ event.nombre }}" width="100">
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>You haven't created any events yet.</p>
+  {% endif %}
+  
+  <a href="{% url 'crear_evento' %}">Create New Event</a>
+
+  <hr>
+  <h3>Activity Feed</h3>
+  {% if activity_feed %}
+    <ul>
+      {% for activity in activity_feed %}
+        <li>
+          <strong>{{ activity.user.username }}</strong> {{ activity.get_activity_type_display }}:
+          {% if activity.content_object_url %}
+            <a href="{{ activity.content_object_url }}">{{ activity.description }}</a>
+          {% else %}
+            {{ activity.description }}
+          {% endif %}
+          <small>({{ activity.created_at|timesince }} ago)</small>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No recent activity from users you follow or your own activity.</p>
+  {% endif %}
+{% endblock %}

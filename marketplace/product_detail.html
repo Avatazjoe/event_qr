@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>{{ product.name }}</h2>
+  
+  {% if product.image %}
+    <img src="{{ product.image.url }}" alt="{{ product.name }}" style="max-width: 400px; max-height: 400px;">
+  {% endif %}
+  
+  <p><strong>Description:</strong></p>
+  <p>{{ product.description|linebreaks }}</p>
+  
+  <p><strong>Price:</strong> ${{ product.price }}</p>
+  
+  <p><strong>Seller:</strong> 
+    <a href="{% url 'profile_view' product.seller.username %}">{{ product.seller.username }}</a>
+  </p>
+  
+  <p><small>Listed: {{ product.created_at|date:"F d, Y H:i" }}</small></p>
+  <p><small>Last updated: {{ product.updated_at|date:"F d, Y H:i" }}</small></p>
+
+  {% if request.user == product.seller %}
+    {# <a href="{% url 'edit_product' product.pk %}">Edit Product</a> #}
+    {# <a href="{% url 'delete_product' product.pk %}">Delete Product</a> #}
+    <p><em>You are the seller of this product. (Edit/Delete links to be implemented)</em></p>
+  {% endif %}
+  
+  <p><a href="{% url 'product_list' %}">Back to Marketplace</a></p>
+{% endblock %}

@@ -14,6 +14,7 @@ urlpatterns = [
     path('recepcion/', views.recepcion, name='recepcion'),
     path('estadisticas/', views.estadisticas, name='estadisticas'),
     path('estadisticas/<int:evento_id>/', views.estadisticas_evento, name='estadisticas_evento'),  # Accepts integer evento_id
+    path('crear_evento/', views.crear_evento, name='crear_evento'), # URL for creating events
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

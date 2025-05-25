@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>{{ viewed_user.username }}'s Profile</h2>
+
+  {% if user_profile.profile_picture %}
+    <img src="{{ user_profile.profile_picture.url }}" alt="{{ viewed_user.username }}'s profile picture" width="150">
+  {% endif %}
+  <p>Bio: {{ user_profile.bio|default:"No bio yet." }}</p>
+  
+  <p>Followers: {{ followers_count }} | Following: {{ following_count }}</p>
+  
+  {% if request.user.is_authenticated and request.user != viewed_user %}
+    {% if is_following %}
+      <form method="post" action="{% url 'unfollow_user' viewed_user.username %}">
+        {% csrf_token %}
+        <button type="submit">Unfollow</button>
+      </form>
+    {% else %}
+      <form method="post" action="{% url 'follow_user' viewed_user.username %}">
+        {% csrf_token %}
+        <button type="submit">Follow</button>
+      </form>
+    {% endif %}
+  {% endif %}
+
+  {# Links to follower/following lists - to be implemented later if needed #}
+  {# <a href="{% url 'followers_list' viewed_user.username %}">View Followers</a> #}
+  {# <a href="{% url 'following_list' viewed_user.username %}">View Following</a> #}
+
+  {# Display user's events - Placeholder, can be expanded #}
+  {# <h3>Events by {{ viewed_user.username }}</h3> #}
+  {# {% if user_events %} #}
+  {#   <ul> #}
+  {#     {% for event in user_events %} #}
+  {#       <li><a href="{% url 'evento_detalle' event.uuid_id %}">{{ event.nombre }}</a></li> #}
+  {#     {% endfor %} #}
+  {#   </ul> #}
+  {# {% else %} #}
+  {#   <p>{{ viewed_user.username }} has not created any events yet.</p> #}
+  {# {% endif %} #}
+
+{% endblock %}

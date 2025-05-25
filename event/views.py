@@ -3,6 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from .models import Evento, Entrada
 from .forms import EntradaForm
+from users.models import Activity # Import Activity model
+from django.urls import reverse # To generate URLs
 
 from django.db.models import Count, Sum
 from django.utils import timezone
@@ -95,3 +97,24 @@ def verificar_entrada(request, hash):
         'evento': entrada.evento.nombre,
         'precio': str(entrada.precio),
     })
+
+@login_required
+def crear_evento(request):
+    if request.method == 'POST':
+        form = EventoForm(request.POST, request.FILES)
+        if form.is_valid():
+            evento = form.save(commit=False)
+            evento.creator = request.user  # Set the creator to the logged-in user
+            evento.save() # Save the event to get an ID for the URL
+            
+            # Log activity
+            Activity.objects.create(
+                user=request.user,
+                activity_type='event_created',
+                description=f'Created event: {evento.nombre}',
+                content_object_url=reverse('evento_detalle', kwargs={'evento_id': evento.id})
+            )
+            return redirect('dashboard')  # Redirect to the user's dashboard
+    else:
+        form = EventoForm()
+    return render(request, 'event/crear_evento.html', {'form': form})
