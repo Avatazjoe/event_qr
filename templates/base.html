@@ -1,8 +1,10 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
     <title>{{ meta_title|default:"Event QR - Your Event Destination" }}</title>
     <meta name="description" content="{{ meta_description|default:'Find and manage your event tickets and marketplace listings easily with Event QR.' }}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/custom_styles.css' %}">
     <style>
         .active-link {
             font-weight: bold;
@@ -26,7 +28,11 @@
         {% if user.is_authenticated %}
             <a href="{% url 'users:dashboard' %}" {% if request.resolver_match.view_name == 'users:dashboard' %}class="active-link"{% endif %}>Dashboard</a>
             |
-            <a href="{% url 'users:profile' %}" {% if request.resolver_match.view_name == 'users:profile' %}class="active-link"{% endif %}>Profile</a>
+            <a href="{% url 'event:crear_evento' %}" {% if request.resolver_match.view_name == 'event:crear_evento' %}class="active-link"{% endif %}>Create Event</a>
+            |
+            <a href="{% url 'marketplace:create_product' %}" {% if request.resolver_match.view_name == 'marketplace:create_product' %}class="active-link"{% endif %}>Create Product</a>
+            |
+            <a href="{% url 'users:profile' %}" {% if request.resolver_match.view_name == 'users:profile' %}class="active-link"{% endif %}>My Profile</a>
             |
             <a href="{% url 'users:logout' %}" {% if request.resolver_match.view_name == 'users:logout' %}class="active-link"{% endif %}>Logout</a>
         {% else %}
