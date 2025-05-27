@@ -135,3 +135,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Authentication URLs
+LOGIN_URL = 'users:login'
+LOGIN_REDIRECT_URL = 'landing_page_root' # Or '/' if you prefer direct paths
+LOGOUT_REDIRECT_URL = 'landing_page_root' # Or '/'

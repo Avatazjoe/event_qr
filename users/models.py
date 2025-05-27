@@ -7,6 +7,13 @@ class UserProfile(models.Model):
     profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
     bio = models.TextField(blank=True)
     phone_number = PhoneNumberField(blank=True)
+    ROLE_CHOICES = [
+        ('organizer', 'Organizer'),
+        ('owner', 'Owner'),
+        ('professional', 'Professional'),
+        ('group_team', 'Group/Team'),
+    ]
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='professional')
 
     def __str__(self):
         return self.user.username

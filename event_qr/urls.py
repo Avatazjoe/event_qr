@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.contrib.sitemaps.views import sitemap
 from .sitemaps import EventoSitemap, ProductSitemap, UserProfilesSitemap
+from users.views import LandingPageView # Import LandingPageView
 
 sitemaps = {
     'eventos': EventoSitemap,
@@ -26,9 +27,10 @@ sitemaps = {
 }
 
 urlpatterns = [
+    path("", LandingPageView.as_view(), name="landing_page_root"), # Map root to LandingPageView
     path("admin/", admin.site.urls),
     path('event/', include('event.urls', namespace='event')),
-    path('users/', include('users.urls', namespace='users')),
+    path('users/', include('users.urls', namespace='users')), # users.urls already included
     path('marketplace/', include('marketplace.urls', namespace='marketplace')),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
 ]

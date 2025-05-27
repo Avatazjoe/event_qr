@@ -28,7 +28,10 @@
             |
             <a href="{% url 'users:profile' %}" {% if request.resolver_match.view_name == 'users:profile' %}class="active-link"{% endif %}>Profile</a>
             |
-            <a href="{% url 'users:logout' %}" {% if request.resolver_match.view_name == 'users:logout' %}class="active-link"{% endif %}>Logout</a>
+            <form action="{% url 'users:logout' %}" method="post" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" style="background:none; border:none; padding:0; margin:0; color:blue; text-decoration:underline; cursor:pointer; {% if request.resolver_match.view_name == 'users:logout' %}font-weight:bold; color:navy;{% endif %}">Logout</button>
+            </form>
         {% else %}
             <a href="{% url 'users:login' %}" {% if request.resolver_match.view_name == 'users:login' %}class="active-link"{% endif %}>Login</a>
             |
