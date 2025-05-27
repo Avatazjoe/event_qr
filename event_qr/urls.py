@@ -16,10 +16,19 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.contrib.sitemaps.views import sitemap
+from .sitemaps import EventoSitemap, ProductSitemap, UserProfilesSitemap
+
+sitemaps = {
+    'eventos': EventoSitemap,
+    'products': ProductSitemap,
+    'users': UserProfilesSitemap,
+}
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path('', include('event.urls')),  # Incluye las rutas definidas en event/urls.py
-    path('users/', include('users.urls')), # Incluye las rutas de la app users
-    path('marketplace/', include('marketplace.urls')), # Incluye las rutas de la app marketplace
+    path('event/', include('event.urls', namespace='event')),
+    path('users/', include('users.urls', namespace='users')),
+    path('marketplace/', include('marketplace.urls', namespace='marketplace')),
+    path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
 ]
