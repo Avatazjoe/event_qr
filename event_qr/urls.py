@@ -19,6 +19,13 @@ from django.urls import path, include
 from django.contrib.sitemaps.views import sitemap
 from .sitemaps import EventoSitemap, ProductSitemap, UserProfilesSitemap
 from users.views import LandingPageView # Import LandingPageView
+from django.contrib.auth import views as auth_views # Added for auth views
+from django.conf import settings # For media files in development
+from django.conf.urls.static import static # For media files in development
+
+# Assuming event.views.home might be used elsewhere or was a placeholder,
+# for now, LandingPageView is the effective project home.
+# from event.views import home # This was in the provided snippet
 
 sitemaps = {
     'eventos': EventoSitemap,
@@ -27,10 +34,24 @@ sitemaps = {
 }
 
 urlpatterns = [
-    path("", LandingPageView.as_view(), name="landing_page_root"), # Map root to LandingPageView
     path("admin/", admin.site.urls),
+    path("", LandingPageView.as_view(), name="project_home"), # Renamed landing_page_root to project_home
+
+    # App-specific URLs
     path('event/', include('event.urls', namespace='event')),
-    path('users/', include('users.urls', namespace='users')), # users.urls already included
+    path('users/', include('users.urls', namespace='users')),
     path('marketplace/', include('marketplace.urls', namespace='marketplace')),
+
+    # Auth URLs from the provided snippet
+    path('login/', auth_views.LoginView.as_view(template_name='users/login.html'), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(next_page='project_home'), name='logout'),
+    path('password_change/', auth_views.PasswordChangeView.as_view(template_name='users/password_change_form.html'), name='password_change'),
+    path('password_change/done/', auth_views.PasswordChangeDoneView.as_view(template_name='users/password_change_done.html'), name='password_change_done'),
+
+    # Sitemap
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
 ]
+
+# Serve media files during development
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

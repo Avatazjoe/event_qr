@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ product.name }} - Product Details{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-6">
+            {% if product.image %}
+                <img src="{{ product.image.url }}" class="img-fluid rounded" alt="{{ product.name }}">
+            {% else %}
+                <img src="{% static 'images/default_product_image.png' %}" class="img-fluid rounded" alt="Default product image">
+            {% endif %}
+        </div>
+        <div class="col-md-6">
+            <h1>{{ product.name }}</h1>
+            <p class="text-muted">Price: ${{ product.price }}</p>
+            <p>{{ product.description }}</p>
+            
+            <div class="mt-3">
+                <!-- Add to cart button or other actions here -->
+                <a href="{% url 'marketplace:create_order' product.id %}" class="btn btn-success">Buy Now (Test Order)</a>
+            </div>
+            
+            <div class="mt-4">
+                <a href="{% url 'marketplace:product_list' %}" class="btn btn-outline-secondary">Back to Marketplace</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Optional: Section for related products or reviews -->
+    <!-- 
+    <div class="mt-5">
+        <h3>Related Products</h3>
+        <div class="row">
+            {% comment %}
+            {% for related_product in related_products %}
+            <div class="col-md-4">
+                <div class="card">
+                    <img src="{{ related_product.image.url }}" class="card-img-top" alt="{{ related_product.name }}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ related_product.name }}</h5>
+                        <a href="{% url 'marketplace:product_detail' related_product.id %}" class="btn btn-primary">View</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% endcomment %}
+        </div>
+    </div>
+    -->
+</div>
+{% endblock %}

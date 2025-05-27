@@ -1,0 +1,121 @@
+/* Basic body and page background */
+body {
+    font-family: sans-serif;
+    margin: 0;
+    background-color: #f0f2f5; /* Light gray page background */
+    color: #333;
+}
+
+.container {
+    width: 80%;
+    margin: 20px auto; /* Centered container */
+    padding: 20px;
+    background-color: #fff; /* White background for content */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Navigation bar styling */
+nav {
+    background-color: #003366; /* Dark blue background */
+    padding: 1em 0;
+    color: white;
+}
+
+nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+nav ul li {
+    display: inline;
+    margin-right: 20px;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+nav ul li a:hover {
+    text-decoration: underline;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+    color: #003366; /* Dark blue for headings */
+}
+
+/* Buttons */
+button, .button, input[type="submit"] {
+    background-color: #0056b3; /* Medium blue for buttons */
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+button:hover, .button:hover, input[type="submit"]:hover {
+    background-color: #003366; /* Darker blue on hover */
+}
+
+/* Forms */
+form p {
+    margin-bottom: 10px;
+}
+form input[type="text"],
+form input[type="email"],
+form input[type="password"],
+form input[type="number"],
+form textarea,
+form select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+/* Links */
+a {
+    color: #0056b3; /* Medium blue for links */
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Images */
+img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px; /* Slightly rounded corners for images */
+}
+
+/* Lists */
+ul, ol {
+    padding-left: 20px;
+}
+
+/* Tables */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background-color: #f0f2f5; /* Light gray for table headers */
+    color: #003366; /* Dark blue text for table headers */
+}

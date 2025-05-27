@@ -52,3 +52,32 @@ class Activity(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.get_activity_type_display()} at {self.created_at.strftime('%Y-%m-%d %H:%M')}"
+
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+class Profile(models.Model):
+    USER_ROLE_CHOICES = [
+        ('user', 'User'),
+        ('organizer', 'Organizer'),
+        ('owner', 'Owner'),
+        ('professional', 'Professional'),
+        ('group_team', 'Group/Team'),
+    ]
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
+    bio = models.TextField(null=True, blank=True)
+    role = models.CharField(
+        max_length=20, 
+        choices=USER_ROLE_CHOICES,
+        default='user', # Set default to 'user'
+    )
+
+    def __str__(self):
+        return f"{self.user.username}'s Profile ({self.get_role_display()})"
+
+@receiver(post_save, sender=User)
+def create_or_update_user_profile(sender, instance, created, **kwargs): # Renamed for clarity
+    if created:
+        Profile.objects.create(user=instance)
+    instance.profile.save() # Ensure profile is saved on user update too, if needed for other reasons

@@ -1,0 +1,68 @@
+<!-- marketplace/product_list.html -->
+{% extends "base.html" %}
+{% load static %} <!-- Ensuring static is loaded if not already by base.html -->
+{% block title %}Marketplace - Products{% endblock %}
+
+{% block content %}
+<div class="container mt-4"> <!-- Assuming .container class is for general layout -->
+  <h1>Marketplace</h1>
+
+  <div class="mb-3">
+    <form method="get" action="{% url 'marketplace:product_list' %}"> <!-- Ensure 'product_list' is the correct URL name -->
+      <div class="input-group">
+        <input type="text" name="q" value="{{ query|default_if_none:'' }}" placeholder="Search products..." class="form-control">
+        <button type="submit" class="btn btn-primary">Search</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="row">
+    {% for product in products %}
+      <div class="col-md-4 mb-4">
+        <div class="card h-100">
+          {% if product.image %}
+            <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="height: 200px; object-fit: cover;">
+          {% else %}
+            <img src="{% static 'images/default_product_image.png' %}" class="card-img-top" alt="Default product image" style="height: 200px; object-fit: cover;"> <!-- Placeholder for default image -->
+          {% endif %}
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title">{{ product.name }}</h5>
+            <p class="card-text">{{ product.description|truncatewords:20 }}</p>
+            <h6>${{ product.price }}</h6>
+            <a href="{% url 'marketplace:product_detail' product.id %}" class="btn btn-outline-primary mt-auto">View Details</a>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col">
+        <p>No products found.</p>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Pagination -->
+  {% if products.has_other_pages %}
+  <nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination justify-content-center">
+      {% if products.has_previous %}
+        <li class="page-item"><a class="page-link" href="?page=1{% if query %}&q={{ query }}{% endif %}">&laquo; first</a></li>
+        <li class="page-item"><a class="page-link" href="?page={{ products.previous_page_number }}{% if query %}&q={{ query }}{% endif %}">previous</a></li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">&laquo; first</span></li>
+        <li class="page-item disabled"><span class="page-link">previous</span></li>
+      {% endif %}
+
+      <li class="page-item disabled"><span class="page-link">Page {{ products.number }} of {{ products.paginator.num_pages }}.</span></li>
+
+      {% if products.has_next %}
+        <li class="page-item"><a class="page-link" href="?page={{ products.next_page_number }}{% if query %}&q={{ query }}{% endif %}">next</a></li>
+        <li class="page-item"><a class="page-link" href="?page={{ products.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}">last &raquo;</a></li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">next</span></li>
+        <li class="page-item disabled"><span class="page-link">last &raquo;</span></li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% endif %}
+</div>
+{% endblock %}
