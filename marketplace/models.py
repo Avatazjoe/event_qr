@@ -1,50 +1,45 @@
 from django.db import models
-from django.contrib.auth.models import User
-from django.urls import reverse_lazy # Changed to reverse_lazy for models
-from django.utils.text import slugify
+from django.contrib.auth import get_user_model
+
+User = get_user_model() # Ensure this is present if not already
 
 class Product(models.Model):
-    name = models.CharField(max_length=200)
-    slug = models.SlugField(unique=True, blank=True, max_length=255) # Added slug field
+    name = models.CharField(max_length=255)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    seller = models.ForeignKey(User, on_delete=models.CASCADE, related_name='products')
-    image = models.ImageField(upload_to='product_images/', blank=True, null=True)
+    image = models.ImageField(upload_to='products/', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
 
-    def save(self, *args, **kwargs):
-        generate_new_slug = False
-        if not self.slug: # If slug is not set
-            generate_new_slug = True
-        elif self.pk: # If object exists, check if name changed
-            try:
-                old_instance = Product.objects.get(pk=self.pk)
-                if old_instance.name != self.name:
-                    generate_new_slug = True
-            except Product.DoesNotExist:
-                generate_new_slug = True # Should not happen if self.pk exists
+from django.conf import settings # To get the User model
 
-        if generate_new_slug:
-            base_slug = slugify(self.name)
-            self.slug = base_slug
-            counter = 1
-            # Ensure slug uniqueness, excluding current instance if it exists
-            queryset = Product.objects.filter(slug=self.slug)
-            if self.pk:
-                queryset = queryset.exclude(pk=self.pk)
-            while queryset.exists():
-                self.slug = f'{base_slug}-{counter}'
-                counter += 1
-                queryset = Product.objects.filter(slug=self.slug)
-                if self.pk: # Re-check queryset for the new slug
-                    queryset = queryset.exclude(pk=self.pk)
-        
-        super().save(*args, **kwargs)
+class Order(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='orders')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    paid = models.BooleanField(default=False) # Simple paid status
+    # Add other fields like shipping address, total amount if not calculated from items, etc.
+    # For now, total will be derived from OrderItems.
 
-    def get_absolute_url(self):
-        # Uses namespaced URL 'marketplace:product_detail'
-        return reverse_lazy('marketplace:product_detail', kwargs={'slug': self.slug})
+    class Meta:
+        ordering = ('-created_at',)
+
+    def __str__(self):
+        return f'Order {self.id} by {self.user.username}'
+
+    def get_total_cost(self):
+        return sum(item.get_cost() for item in self.items.all())
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, related_name='order_items', on_delete=models.CASCADE)
+    price = models.DecimalField(max_digits=10, decimal_places=2) # Price at the time of order
+    quantity = models.PositiveIntegerField(default=1)
+
+    def __str__(self):
+        return str(self.id)
+
+    def get_cost(self):
+        return self.price * self.quantity

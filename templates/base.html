@@ -1,8 +1,10 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
     <title>{{ meta_title|default:"Event QR - Your Event Destination" }}</title>
     <meta name="description" content="{{ meta_description|default:'Find and manage your event tickets and marketplace listings easily with Event QR.' }}">
+    <link rel="stylesheet" href="{% static 'css/custom_styles.css' %}">
     <style>
         .active-link {
             font-weight: bold;
@@ -15,25 +17,31 @@
 </head>
 <body>
     <nav>
-        <a href="{% url 'event:home' %}">
+        <a href="{% url 'project_home' %}">
             <img src="https://ilovejoes.weebly.com/uploads/1/9/4/9/19498995/logo-mini_orig.png" alt="Event QR Logo" style="height: 40px;">
         </a>
         |
-        <a href="{% url 'event:home' %}" {% if request.resolver_match.view_name == 'event:home' %}class="active-link"{% endif %}>Home</a>
+        <a href="{% url 'project_home' %}" {% if request.resolver_match.view_name == 'project_home' %}class="active-link"{% endif %}>Home</a>
         |
         <a href="{% url 'marketplace:product_list' %}" {% if request.resolver_match.view_name == 'marketplace:product_list' %}class="active-link"{% endif %}>Marketplace</a>
         |
         {% if user.is_authenticated %}
             <a href="{% url 'users:dashboard' %}" {% if request.resolver_match.view_name == 'users:dashboard' %}class="active-link"{% endif %}>Dashboard</a>
             |
-            <a href="{% url 'users:profile' %}" {% if request.resolver_match.view_name == 'users:profile' %}class="active-link"{% endif %}>Profile</a>
+            <a href="{% url 'users:profile' %}" {% if request.resolver_match.view_name == 'users:profile' %}class="active-link"{% endif %}>My Profile</a>
+            {% if user.profile.role != 'user' %}
             |
-            <form action="{% url 'users:logout' %}" method="post" style="display: inline;">
+            <a href="{% url 'event:crear_evento' %}" {% if request.resolver_match.view_name == 'event:crear_evento' %}class="active-link"{% endif %}>Create Event</a>
+            |
+            <a href="{% url 'marketplace:create_product' %}" {% if request.resolver_match.view_name == 'marketplace:create_product' %}class="active-link"{% endif %}>Create Product</a>
+            {% endif %}
+            |
+            <form action="{% url 'logout' %}" method="post" style="display: inline;">
                 {% csrf_token %}
-                <button type="submit" style="background:none; border:none; padding:0; margin:0; color:blue; text-decoration:underline; cursor:pointer; {% if request.resolver_match.view_name == 'users:logout' %}font-weight:bold; color:navy;{% endif %}">Logout</button>
+                <button type="submit" style="background:none; border:none; padding:0; margin:0; color:blue; text-decoration:underline; cursor:pointer; {% if request.resolver_match.view_name == 'logout' %}font-weight:bold; color:navy;{% endif %}">Logout ({{ user.username }})</button>
             </form>
         {% else %}
-            <a href="{% url 'users:login' %}" {% if request.resolver_match.view_name == 'users:login' %}class="active-link"{% endif %}>Login</a>
+            <a href="{% url 'login' %}" {% if request.resolver_match.view_name == 'login' %}class="active-link"{% endif %}>Login</a>
             |
             <a href="{% url 'users:register' %}" {% if request.resolver_match.view_name == 'users:register' %}class="active-link"{% endif %}>Register</a>
         {% endif %}
