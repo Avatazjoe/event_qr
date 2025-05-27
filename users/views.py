@@ -12,6 +12,7 @@ from django.http import HttpResponseRedirect
 from .forms import UserRegistrationForm, UserProfileForm
 from .models import UserProfile, Follow, Activity
 from event.models import Evento
+from marketplace.models import Product
 
 
 def register(request): # Stays as function-based view
@@ -21,12 +22,25 @@ def register(request): # Stays as function-based view
             user = form.save(commit=False)
             user.set_password(form.cleaned_data['password'])
             user.save()
-            UserProfile.objects.create(user=user) # Ensure UserProfile is created
+            # Ensure UserProfile is created with the role
+            UserProfile.objects.create(user=user, role=form.cleaned_data['role'])
             login(request, user) # Log the user in
             return redirect('event:home')  # Redirect to namespaced home page after registration
     else:
         form = UserRegistrationForm()
     return render(request, 'users/register.html', {'form': form})
+
+
+class LandingPageView(TemplateView):
+    template_name = 'users/landing_page.html' # Or a more generic path like 'landing_page.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Fetch latest 5 events (order by most recent or upcoming, e.g., by 'created_at' or 'fecha')
+        context['events'] = Evento.objects.order_by('-created_at')[:5]
+        # Fetch latest 5 products
+        context['products'] = Product.objects.order_by('-created_at')[:5]
+        return context
 
 
 class ProfileUpdateView(LoginRequiredMixin, UpdateView):
