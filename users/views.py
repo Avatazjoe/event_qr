@@ -19,6 +19,7 @@ from .forms import (
     OrganizerProfileForm,
     ProfessionalProfileForm,
     GroupProfileForm,
+    AdvancedRoleSelectionForm,
 )
 
 from event.models import Evento
@@ -126,139 +127,101 @@ class UnfollowUserView(LoginRequiredMixin, View):
         return HttpResponseRedirect(reverse('users:profile_view', kwargs={'username': username}))
 
 
+ROLE_SPECIFIC_FORMS = {
+    Profile.ROLE_OWNER: OwnerProfileForm,
+    Profile.ROLE_ORGANIZER: OrganizerProfileForm,
+    Profile.ROLE_PROFESSIONAL: ProfessionalProfileForm,
+    Profile.ROLE_GROUP_TEAM: GroupProfileForm,
+}
+
 @login_required
 def profile(request):
-    user_profile = request.user.profile
+    profile, created = Profile.objects.get_or_create(user=request.user)
+
+    # Initialize forms to None, they will be set based on context
+    advanced_role_form = None
+    role_specific_form = None
 
     if request.method == 'POST':
-        form = ProfileForm(request.POST, request.FILES, instance=user_profile)
-        if form.is_valid():
-            form.save()
-            return redirect('users:profile')
-    else:
-        form = ProfileForm(instance=user_profile)
-
-    return render(request, 'users/profile.html', {
-        'form': form,
-        'user': request.user
-    })
-
-
-# === Selección y edición por rol ===
-
-@login_required
-def profile_view(request):
-    """
-    Muestra el perfil del usuario y permite seleccionar un rol avanzado.
-    Si ya tiene un rol avanzado, redirige a la vista específica.
-    """
-    profile = get_object_or_404(Profile, user=request.user)
-
-    if request.method == 'POST':
-        selected_role = request.POST.get('role')
-        valid_roles = [choice[0] for choice in Profile.USER_ROLE_CHOICES if choice[0] != 'user']
-
-        if selected_role in valid_roles:
-            profile.role = selected_role
-            profile.save()
-            return redirect(f'update_{selected_role}_profile')
-
-    #return render(request, 'users/profile.html', {'profile': profile})
-    return redirect('users:update_{}_profile'.format(selected_role))
-
-
-@login_required
-def update_owner_profile(request):
-    profile = get_object_or_404(Profile, user=request.user)
-
-    if request.method == 'POST':
-        form = OwnerProfileForm(request.POST, instance=profile)
-        if form.is_valid():
-            form.save()
-            return redirect('users:profile')
-    else:
-        form = OwnerProfileForm(instance=profile)
-
-    return render(request, 'users/update_owner_profile.html', {'form': form})
-
-
-@login_required
-def update_organizer_profile(request):
-    profile = get_object_or_404(Profile, user=request.user)
-
-    if request.method == 'POST':
-        form = OrganizerProfileForm(request.POST, instance=profile)
-        if form.is_valid():
-            form.save()
-            return redirect('users:profile')
-    else:
-        form = OrganizerProfileForm(instance=profile)
-
-    return render(request, 'users/update_organizer_profile.html', {'form': form})
-
-
-@login_required
-def update_professional_profile(request):
-    profile = get_object_or_404(Profile, user=request.user)
-
-    if request.method == 'POST':
-        form = ProfessionalProfileForm(request.POST, instance=profile)
-        if form.is_valid():
-            form.save()
-            return redirect('users:profile')
-    else:
-        form = ProfessionalProfileForm(instance=profile)
-
-    return render(request, 'users/update_professional_profile.html', {'form': form})
-
-
-@login_required
-def update_group_profile(request):
-    profile = get_object_or_404(Profile, user=request.user)
-
-    if request.method == 'POST':
-        form = GroupProfileForm(request.POST, instance=profile)
-        if form.is_valid():
-            group_profile = form.save(commit=False)
-            group_profile.team_leader = request.user
-            group_profile.save()
-            form.save_m2m()  # Guarda las relaciones ManyToMany
-            return redirect('users:profile')
-    else:
-        form = GroupProfileForm(instance=profile)
-
-    return render(request, 'users/update_group_profile.html', {'form': form})
-
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect
-from django.contrib import messages
-from .models import Profile
-
-
-@login_required
-def set_advanced_role(request):
-    """
-    Permite al usuario cambiar su rol desde 'user' a uno de los roles avanzados.
-    La vista solo acepta peticiones POST y valida que el nuevo rol esté permitido.
-    """
-    if request.method == 'POST':
-        new_role = request.POST.get('role')
-
-        # Lista de roles avanzados válidos
-        ADVANCED_ROLES = [
-            Profile.ROLE_ORGANIZER,
-            Profile.ROLE_OWNER,
-            Profile.ROLE_PROFESSIONAL,
-            Profile.ROLE_GROUP_TEAM,
-        ]
-
-        if new_role in ADVANCED_ROLES:
-            request.user.profile.role = new_role
-            request.user.profile.save()
-            messages.success(request, f"Rol actualizado a: {new_role}")
+        if 'submit_advanced_role' in request.POST:
+            # User is submitting the AdvancedRoleSelectionForm
+            advanced_role_form = AdvancedRoleSelectionForm(request.POST)
+            if advanced_role_form.is_valid():
+                profile.role = advanced_role_form.cleaned_data['role']
+                profile.advanced_role_selected_once = True
+                profile.save()
+                messages.success(request, "Role updated successfully!")
+                return redirect('users:profile')
+            # If form is invalid, it will be passed to the template below
         else:
-            messages.error(request, "Rol no válido.")
+            # User is submitting a role-specific profile form
+            FormClass = ROLE_SPECIFIC_FORMS.get(profile.role)
+            if FormClass:
+                role_specific_form = FormClass(request.POST, request.FILES, instance=profile)
+                if role_specific_form.is_valid():
+                    role_specific_form.save()
+                    messages.success(request, "Profile updated successfully!")
+                    return redirect('users:profile')
+                # If form is invalid, it will be passed to the template below
+            else:
+                # Fallback or error: No specific form for this role or role not set
+                # This case should ideally not be reached if logic is correct
+                messages.error(request, "Error processing profile update.")
+                # Optionally, use a generic form like ProfileForm if appropriate
+                # For now, just redirect or let it fall through to GET
+                return redirect('users:profile')
 
-    return redirect('users:profile')
+    # GET request or fall-through from invalid POST
+    current_form = None
+    show_role_selection_form = False
+
+    if profile.role in ROLE_SPECIFIC_FORMS:
+        # User has an advanced role
+        # If role_specific_form is already set (from invalid POST), use it, else create new
+        current_form = role_specific_form if role_specific_form else ROLE_SPECIFIC_FORMS[profile.role](instance=profile)
+    elif profile.role == Profile.ROLE_USER:
+        if profile.advanced_role_selected_once:
+            # Scenario 2: User is 'user' but selected an advanced role before
+            show_role_selection_form = True
+            current_form = advanced_role_form if advanced_role_form else AdvancedRoleSelectionForm()
+        else:
+            # Scenario 3: User is 'user' and choosing for the first time OR initial view
+            if request.GET.get('action') == 'select_role':
+                show_role_selection_form = True
+                current_form = advanced_role_form if advanced_role_form else AdvancedRoleSelectionForm()
+            else:
+                # Initial view for a 'user' not yet selecting a role.
+                # No form is shown by default, template will show "Elegir Rol Avanzado" button.
+                # If you want to show a basic ProfileForm (avatar/bio) here, you could instantiate it.
+                # For this task, current_form remains None if no action and not advanced_role_selected_once.
+                pass # current_form remains None
+
+    # Default/Fallback form assignment if still None but should have one
+    if current_form is None:
+        if show_role_selection_form: # This implies advanced_role_form should have been set or is new
+            current_form = advanced_role_form if advanced_role_form else AdvancedRoleSelectionForm()
+        elif profile.role == Profile.ROLE_USER and not show_role_selection_form and not profile.advanced_role_selected_once:
+            # This is the state where the user is basic, hasn't selected a role via ?action=select_role
+            # and hasn't selected an advanced role before. The template will show a button.
+            # Optionally, show a basic ProfileForm for avatar/bio.
+            # For now, we assume role-specific forms handle all profile fields including avatar/bio.
+            # If you need a basic form: current_form = ProfileForm(instance=profile)
+            pass
+
+
+    context = {
+        'form': current_form,
+        'profile': profile,
+        'show_role_selection_form': show_role_selection_form,
+        'current_role': profile.role,
+        'advanced_role_selected_once': profile.advanced_role_selected_once,
+        'show_select_advanced_role_button': (
+            profile.role == Profile.ROLE_USER and
+            not profile.advanced_role_selected_once and
+            not show_role_selection_form and
+            request.GET.get('action') != 'select_role' # Also hide if action=select_role is present
+        )
+    }
+    return render(request, 'users/profile.html', context)
 
 
