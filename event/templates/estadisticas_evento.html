@@ -1,67 +1,68 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estadísticas de {{ evento.nombre }}</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.3/index.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
-</head>
-<body>
+{% extends "base.html" %}
+
+{% block title %}Estadísticas de {{ evento.nombre }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4"> {# Added a container for consistency with Bootstrap layout #}
     <h1>Estadísticas de {{ evento.nombre }}</h1>
     <p>Total de entradas: {{ total_entradas_evento }}</p>
     <p>Entradas pagadas: {{ entradas_pagadas_evento }}</p>
     <p>Entradas sin pagar: {{ entradas_sin_pagar_evento }}</p>
 
     <canvas id="ventasChart"></canvas>
+</div>
+{% endblock %}
 
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Retrieve data from Django context
-        const reservasPorFecha = {{ reservas_por_fecha|safe }};
-        const pagosPorFecha = {{ pagos_por_fecha|safe }};
+{% block page_scripts %}
+{# Scripts specific to this page, ensure they are loaded after the DOM elements they interact with #}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.3/index.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Retrieve data from Django context
+    const reservasPorFecha = {{ reservas_por_fecha|safe }};
+    const pagosPorFecha = {{ pagos_por_fecha|safe }};
 
-        const labels = reservasPorFecha.map(item => new Date(item.date));
+    const labels = reservasPorFecha.map(item => new Date(item.date));
 
-        const data = {
-            labels: labels,
-            datasets: [
-                {
-                    label: 'Reservas',
-                    data: reservasPorFecha.map(item => ({x: new Date(item.date), y: item.total})),
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    fill: false,
-                },
-                {
-                    label: 'Pagos',
-                    data: pagosPorFecha.map(item => ({x: new Date(item.date), y: item.total})),
-                    borderColor: 'rgba(255, 159, 64, 1)',
-                    fill: false,
-                }
-            ]
-        };
+    const data = {
+        labels: labels,
+        datasets: [
+            {
+                label: 'Reservas',
+                data: reservasPorFecha.map(item => ({x: new Date(item.date), y: item.total})),
+                borderColor: 'rgba(75, 192, 192, 1)',
+                fill: false,
+            },
+            {
+                label: 'Pagos',
+                data: pagosPorFecha.map(item => ({x: new Date(item.date), y: item.total})),
+                borderColor: 'rgba(255, 159, 64, 1)',
+                fill: false,
+            }
+        ]
+    };
 
-        const ctx = document.getElementById('ventasChart');
-        if (ctx) {
-            const ventasChart = new Chart(ctx, {
-                type: 'line',
-                data: data,
-                options: {
-                    scales: {
-                        x: {
-                            type: 'time',
-                            time: {
-                                unit: 'day'
-                            }
+    const ctx = document.getElementById('ventasChart');
+    if (ctx) {
+        const ventasChart = new Chart(ctx, {
+            type: 'line',
+            data: data,
+            options: {
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'day'
                         }
                     }
                 }
-            });
-        } else {
-            console.error('Canvas element "ventasChart" not found');
-        }
-    });
-    </script>
-</body>
-</html>
+            }
+        });
+    } else {
+        console.error('Canvas element "ventasChart" not found');
+    }
+});
+</script>
+{% endblock page_scripts %}

@@ -1,53 +1,75 @@
 {% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>{{ meta_title|default:"Event QR - Your Event Destination" }}</title>
-    <meta name="description" content="{{ meta_description|default:'Find and manage your event tickets and marketplace listings easily with Event QR.' }}">
-    <link rel="stylesheet" href="{% static 'css/custom_styles.css' %}">
-    <style>
-        .active-link {
-            font-weight: bold;
-            color: navy; /* Example style for active link */
-        }
-        nav img {
-            vertical-align: middle;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>{% block title %}QRevent{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/custom_styles.css' %}">
 </head>
 <body>
-    <nav>
-        <a href="{% url 'project_home' %}">
-            <img src="https://ilovejoes.weebly.com/uploads/1/9/4/9/19498995/logo-mini_orig.png" alt="Event QR Logo" style="height: 40px;">
-        </a>
-        |
-        <a href="{% url 'project_home' %}" {% if request.resolver_match.view_name == 'project_home' %}class="active-link"{% endif %}>Home</a>
-        |
-        <a href="{% url 'marketplace:product_list' %}" {% if request.resolver_match.view_name == 'marketplace:product_list' %}class="active-link"{% endif %}>Marketplace</a>
-        |
-        {% if user.is_authenticated %}
-            <a href="{% url 'users:dashboard' %}" {% if request.resolver_match.view_name == 'users:dashboard' %}class="active-link"{% endif %}>Dashboard</a>
-            |
-            <a href="{% url 'users:profile' %}" {% if request.resolver_match.view_name == 'users:profile' %}class="active-link"{% endif %}>My Profile</a>
-            {% if user.profile.role != 'user' %}
-            |
-            <a href="{% url 'event:crear_evento' %}" {% if request.resolver_match.view_name == 'event:crear_evento' %}class="active-link"{% endif %}>Create Event</a>
-            |
-            <a href="{% url 'marketplace:create_product' %}" {% if request.resolver_match.view_name == 'marketplace:create_product' %}class="active-link"{% endif %}>Create Product</a>
-            {% endif %}
-            |
-            <form action="{% url 'logout' %}" method="post" style="display: inline;">
-                {% csrf_token %}
-                <button type="submit" style="background:none; border:none; padding:0; margin:0; color:blue; text-decoration:underline; cursor:pointer; {% if request.resolver_match.view_name == 'logout' %}font-weight:bold; color:navy;{% endif %}">Logout ({{ user.username }})</button>
-            </form>
-        {% else %}
-            <a href="{% url 'login' %}" {% if request.resolver_match.view_name == 'login' %}class="active-link"{% endif %}>Login</a>
-            |
-            <a href="{% url 'users:register' %}" {% if request.resolver_match.view_name == 'users:register' %}class="active-link"{% endif %}>Register</a>
-        {% endif %}
-    </nav>
-    <hr>
-    {% block content %}
-    {% endblock %}
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar (collapsable) -->
+      <nav class="col-md-2 d-md-block sidebar p-3 position-fixed top-0 start-0 h-100 d-none d-md-block">
+        <div class="sidebar-header text-center py-3">
+          <img src="{% static 'images/logo_qrevent.png' %}" alt="QRevent Logo" class="sidebar-logo">
+          <h5 class="sidebar-title mt-2">QRevent</h5>
+        </div>
+        <div class="nav flex-column">
+          <a class="nav-link active" href="#">Events</a>
+          <a class="nav-link" href="#">Applis</a>
+          <a class="nav-link" href="#">Scons</a>
+          <a class="nav-link" href="#">Pones</a>
+          <a class="nav-link" href="#">Tarfals</a>
+          <a class="nav-link" href="#">Payles</a>
+          <a class="nav-link" href="#">Ceplons</a>
+          {% block sidebar_extra_links %}{% endblock %}
+        </div>
+      </nav>
+
+      <!-- Mobile sidebar button -->
+      <nav class="navbar navbar-dark d-md-none bg-transparent px-3 mt-2">
+        <button class="navbar-toggler ms-1" type="button" data-bs-toggle="collapse" data-bs-target="#mobileSidebar" aria-controls="mobileSidebar" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+      </nav>
+      <div class="collapse d-md-none" id="mobileSidebar">
+        <div class="sidebar p-3">
+          <div class="sidebar-header text-center py-3">
+            <img src="{% static 'images/logo_qrevent.png' %}" alt="QRevent Logo" class="sidebar-logo">
+            <h5 class="sidebar-title mt-2">QRevent</h5>
+          </div>
+          <a class="nav-link active" href="#">Events</a>
+          <a class="nav-link" href="#">Applis</a>
+          <a class="nav-link" href="#">Scons</a>
+          <a class="nav-link" href="#">Pones</a>
+          <a class="nav-link" href="#">Tarfals</a>
+          <a class="nav-link" href="#">Payles</a>
+          <a class="nav-link" href="#">Ceplons</a>
+          {% block mobile_sidebar_extra_links %}{% endblock %}
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <main class="offset-md-2 col-md-10 px-4">
+        {% block content %}
+        <!-- Default content if no block is provided -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center mt-4 mb-3">
+          <div class="search-bar flex-grow-1 me-3">
+            <input type="text" class="form-control border-0 bg-transparent text-white" placeholder="Buscar eventos...">
+          </div>
+          <button class="btn btn-outline-light me-2">Filtros</button>
+          <button class="btn btn-outline-light">Usuario</button>
+        </div>
+        <!-- ... rest of mockup's default main content ... -->
+        {% endblock %}
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  {% block page_scripts %}{% endblock %}
 </body>
 </html>

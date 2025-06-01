@@ -1,121 +1,86 @@
-/* Basic body and page background */
 body {
-    font-family: sans-serif;
-    margin: 0;
-    background-color: #f0f2f5; /* Light gray page background */
-    color: #333;
+  min-height: 100vh;
+  margin: 0;
+  background: linear-gradient(270deg, #f5b0ff, #3b7fff, #b0ffdf, #f5b0ff);
+  background-size: 800% 800%;
+  animation: backgroundAnimation 30s ease infinite;
+  font-family: 'Segoe UI', sans-serif;
 }
 
-.container {
-    width: 80%;
-    margin: 20px auto; /* Centered container */
-    padding: 20px;
-    background-color: #fff; /* White background for content */
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+@keyframes backgroundAnimation {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
-/* Navigation bar styling */
-nav {
-    background-color: #003366; /* Dark blue background */
-    padding: 1em 0;
-    color: white;
+.sidebar {
+  background: rgba(24, 28, 47, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #fff;
+  min-height: 100vh; /* Ensured */
 }
 
-nav ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    text-align: center;
+.sidebar .nav-link {
+  color: #fff;
+  margin-bottom: 10px;
 }
 
-nav ul li {
-    display: inline;
-    margin-right: 20px;
+.sidebar .nav-link.active {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
 }
 
-nav ul li a {
-    color: white;
-    text-decoration: none;
-    font-weight: bold;
+.card-custom {
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  color: #fff;
+  overflow: hidden;
 }
 
-nav ul li a:hover {
-    text-decoration: underline;
+.card-custom .card-body {
+  background: rgba(0, 0, 0, 0.4);
 }
 
-/* Headings */
-h1, h2, h3, h4, h5, h6 {
-    color: #003366; /* Dark blue for headings */
+.widget {
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #fff;
+  padding: 18px;
+  margin-bottom: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Buttons */
-button, .button, input[type="submit"] {
-    background-color: #0056b3; /* Medium blue for buttons */
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    text-decoration: none;
+.search-bar {
+  background: rgba(255,255,255,0.12);
+  border-radius: 12px;
+  padding: 10px 20px;
+  color: white;
 }
 
-button:hover, .button:hover, input[type="submit"]:hover {
-    background-color: #003366; /* Darker blue on hover */
+.badge {
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 0.4em 0.75em;
+  font-size: 0.8em;
+  border-radius: 0.6rem;
 }
 
-/* Forms */
-form p {
-    margin-bottom: 10px;
-}
-form input[type="text"],
-form input[type="email"],
-form input[type="password"],
-form input[type="number"],
-form textarea,
-form select {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
+/* Styles for sidebar header, logo, and title from this subtask (subtask 5) */
+.sidebar-header {
+  margin-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Links */
-a {
-    color: #0056b3; /* Medium blue for links */
-    text-decoration: none;
+.sidebar-logo {
+  max-width: 60px;
 }
 
-a:hover {
-    text-decoration: underline;
-}
-
-/* Images */
-img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 4px; /* Slightly rounded corners for images */
-}
-
-/* Lists */
-ul, ol {
-    padding-left: 20px;
-}
-
-/* Tables */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-}
-
-th, td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-}
-
-th {
-    background-color: #f0f2f5; /* Light gray for table headers */
-    color: #003366; /* Dark blue text for table headers */
+.sidebar-title {
+  color: #fff;
 }
