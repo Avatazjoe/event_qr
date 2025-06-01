@@ -29,14 +29,26 @@
               <li><a class="dropdown-item" href="{% url 'event:estadisticas' %}">Statistics</a></li>
             </ul>
           </li>
-          <a class="nav-link" href="{% url 'marketplace:product_list' %}">Marketplace</a>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'marketplace:product_list' %}">Marketplace</a>
+          </li>
           {% if user.is_authenticated %}
+          <li class="nav-item">
             <a class="nav-link" href="{% url 'users:dashboard' %}">Dashboard</a>
+          </li>
+          <li class="nav-item">
             <a class="nav-link" href="{% url 'users:profile' %}">Profile</a>
+          </li>
+          <li class="nav-item">
             <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+          </li>
           {% else %}
+          <li class="nav-item">
             <a class="nav-link" href="{% url 'login' %}">Login</a>
+          </li>
+          <li class="nav-item">
             <a class="nav-link" href="{% url 'users:register' %}">Register</a>
+          </li>
           {% endif %}
           {% block sidebar_extra_links %}{% endblock %}
         </div>
@@ -54,42 +66,48 @@
             <img src="{% static 'images/logo_qrevent.png' %}" alt="QRevent Logo" class="sidebar-logo">
             <h5 class="sidebar-title mt-2">QRevent</h5>
           </div>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Events
-            </a>
-            <ul class="dropdown-menu" data-bs-theme="dark">
-              <li><a class="dropdown-item" href="{% url 'event:home' %}">List Events</a></li>
-              <li><a class="dropdown-item" href="{% url 'event:crear_evento' %}">Create Event</a></li>
-              <li><a class="dropdown-item" href="{% url 'event:recepcion' %}">Reception</a></li>
-              <li><a class="dropdown-item" href="{% url 'event:estadisticas' %}">Statistics</a></li>
-            </ul>
-          </li>
-          <a class="nav-link" href="{% url 'marketplace:product_list' %}">Marketplace</a>
-          {% if user.is_authenticated %}
-            <a class="nav-link" href="{% url 'users:dashboard' %}">Dashboard</a>
-            <a class="nav-link" href="{% url 'users:profile' %}">Profile</a>
-            <a class="nav-link" href="{% url 'logout' %}">Logout</a>
-          {% else %}
-            <a class="nav-link" href="{% url 'login' %}">Login</a>
-            <a class="nav-link" href="{% url 'users:register' %}">Register</a>
-          {% endif %}
-          {% block mobile_sidebar_extra_links %}{% endblock %}
+          <ul class="nav flex-column"> {# Added ul wrapper for mobile as well #}
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Events
+              </a>
+              <ul class="dropdown-menu" data-bs-theme="dark">
+                <li><a class="dropdown-item" href="{% url 'event:home' %}">List Events</a></li>
+                <li><a class="dropdown-item" href="{% url 'event:crear_evento' %}">Create Event</a></li>
+                <li><a class="dropdown-item" href="{% url 'event:recepcion' %}">Reception</a></li>
+                <li><a class="dropdown-item" href="{% url 'event:estadisticas' %}">Statistics</a></li>
+              </ul>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'marketplace:product_list' %}">Marketplace</a>
+            </li>
+            {% if user.is_authenticated %}
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'users:dashboard' %}">Dashboard</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'users:profile' %}">Profile</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+            </li>
+            {% else %}
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'login' %}">Login</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'users:register' %}">Register</a>
+            </li>
+            {% endif %}
+            {% block mobile_sidebar_extra_links %}{% endblock %}
+          </ul>
         </div>
       </div>
 
       <!-- Main Content -->
       <main class="offset-md-2 col-md-10 px-4">
         {% block content %}
-        <!-- Default content if no block is provided -->
-        <div class="d-flex flex-wrap justify-content-between align-items-center mt-4 mb-3">
-          <div class="search-bar flex-grow-1 me-3">
-            <input type="text" class="form-control border-0 bg-transparent text-white" placeholder="Buscar eventos...">
-          </div>
-          <button class="btn btn-outline-light me-2">Filtros</button>
-          <button class="btn btn-outline-light">Usuario</button>
-        </div>
-        <!-- ... rest of mockup's default main content ... -->
+        <!-- Default content removed to allow child templates full control -->
         {% endblock %}
       </main>
     </div>
