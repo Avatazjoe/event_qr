@@ -12,7 +12,8 @@ urlpatterns = [
 
     # path('login/', auth_views.LoginView.as_view(template_name='users/login.html'), name='login'), # Handled at project level
     # path('logout/', auth_views.LogoutView.as_view(next_page='event:home'), name='logout'), # Handled at project level
-    path('profile/', views.profile, name='profile'), # Changed to function-based view
+    path('profile/', views.profile_display, name='profile_display'), # Renamed and points to the display view
+    path('profile/edit/', views.profile_edit, name='profile_edit'),   # New URL for editing profile
 
     #path('profile/select-role/', views.profile_view, name='profile_view'),
     # Redundant role-specific update URLs removed as new profile view handles this.
