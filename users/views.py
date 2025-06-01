@@ -144,6 +144,9 @@ def profile(request):
 
     if request.method == 'POST':
         if 'submit_advanced_role' in request.POST:
+            if profile.advanced_role_selected_once:
+                messages.warning(request, "You have already selected an advanced role and cannot change it.")
+                return redirect('users:profile')
             # User is submitting the AdvancedRoleSelectionForm
             advanced_role_form = AdvancedRoleSelectionForm(request.POST)
             if advanced_role_form.is_valid():
@@ -171,55 +174,55 @@ def profile(request):
                 # For now, just redirect or let it fall through to GET
                 return redirect('users:profile')
 
-    # GET request or fall-through from invalid POST
+    # GET request or fall-through from invalid POST processing
     current_form = None
-    show_role_selection_form = False
+    show_role_selection_form = False # Default to False
 
-    if profile.role in ROLE_SPECIFIC_FORMS:
-        # User has an advanced role
-        # If role_specific_form is already set (from invalid POST), use it, else create new
-        current_form = role_specific_form if role_specific_form else ROLE_SPECIFIC_FORMS[profile.role](instance=profile)
-    elif profile.role == Profile.ROLE_USER:
-        if profile.advanced_role_selected_once:
-            # Scenario 2: User is 'user' but selected an advanced role before
+    if advanced_role_form and advanced_role_form.is_bound:
+        # Case 1: AdvancedRoleSelectionForm was POSTed and is bound (i.e., invalid, valid would have redirected)
+        # This implies profile.advanced_role_selected_once is False (checked in POST section)
+        current_form = advanced_role_form
+        show_role_selection_form = True
+    elif role_specific_form and role_specific_form.is_bound:
+        # Case 2: A role-specific form was POSTed and is bound (invalid)
+        current_form = role_specific_form
+        # show_role_selection_form remains False, as we are dealing with a role-specific form
+    else:
+        # Case 3: This is a GET request or a POST that didn't result in a bound form here
+        # (e.g. successful POSTs redirect, other POSTs are not handled by this view directly)
+
+        # Determine if role selection form should be shown on GET
+        if not profile.advanced_role_selected_once and \
+           profile.role == Profile.ROLE_USER and \
+           request.GET.get('action') == 'select_role':
             show_role_selection_form = True
-            current_form = advanced_role_form if advanced_role_form else AdvancedRoleSelectionForm()
-        else:
-            # Scenario 3: User is 'user' and choosing for the first time OR initial view
-            if request.GET.get('action') == 'select_role':
-                show_role_selection_form = True
-                current_form = advanced_role_form if advanced_role_form else AdvancedRoleSelectionForm()
-            else:
-                # Initial view for a 'user' not yet selecting a role.
-                # No form is shown by default, template will show "Elegir Rol Avanzado" button.
-                # If you want to show a basic ProfileForm (avatar/bio) here, you could instantiate it.
-                # For this task, current_form remains None if no action and not advanced_role_selected_once.
-                pass # current_form remains None
+            current_form = AdvancedRoleSelectionForm()  # New, unbound form for selection
 
-    # Default/Fallback form assignment if still None but should have one
-    if current_form is None:
-        if show_role_selection_form: # This implies advanced_role_form should have been set or is new
-            current_form = advanced_role_form if advanced_role_form else AdvancedRoleSelectionForm()
-        elif profile.role == Profile.ROLE_USER and not show_role_selection_form and not profile.advanced_role_selected_once:
-            # This is the state where the user is basic, hasn't selected a role via ?action=select_role
-            # and hasn't selected an advanced role before. The template will show a button.
-            # Optionally, show a basic ProfileForm for avatar/bio.
-            # For now, we assume role-specific forms handle all profile fields including avatar/bio.
-            # If you need a basic form: current_form = ProfileForm(instance=profile)
-            pass
+        elif profile.role in ROLE_SPECIFIC_FORMS:
+            # User has an existing advanced role (implies advanced_role_selected_once is True,
+            # or admin set it)
+            # Show the appropriate role-specific form
+            current_form = ROLE_SPECIFIC_FORMS[profile.role](instance=profile)
+            show_role_selection_form = False # Do not show role selection if they have an advanced role
 
+        # elif profile.role == Profile.ROLE_USER and not show_role_selection_form:
+            # This covers:
+            # - User is ROLE_USER, advanced_role_selected_once is False, but action is not 'select_role' (button shown)
+            # - User is ROLE_USER, advanced_role_selected_once is True (should not select role again, button not shown)
+            # In these scenarios, current_form remains None, and show_role_selection_form is False.
+            # The template handles showing a button or just profile info.
+            pass # current_form remains None, show_role_selection_form is False
 
     context = {
         'form': current_form,
         'profile': profile,
-        'show_role_selection_form': show_role_selection_form,
+        'show_role_selection_form': show_role_selection_form, # This is now more directly controlled
         'current_role': profile.role,
         'advanced_role_selected_once': profile.advanced_role_selected_once,
         'show_select_advanced_role_button': (
             profile.role == Profile.ROLE_USER and
             not profile.advanced_role_selected_once and
-            not show_role_selection_form and
-            request.GET.get('action') != 'select_role' # Also hide if action=select_role is present
+            not show_role_selection_form # If form isn't shown, button might be
         )
     }
     return render(request, 'users/profile.html', context)
