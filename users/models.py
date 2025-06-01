@@ -79,6 +79,7 @@ class Profile(models.Model):
         choices=USER_ROLE_CHOICES,
         default='user',
     )
+    advanced_role_selected_once = models.BooleanField(default=False, null=True)
 
     # Owner fields
     venue_name = models.CharField('Venue Name', max_length=100, blank=True, null=True)

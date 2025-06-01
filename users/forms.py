@@ -120,3 +120,16 @@ class GroupProfileForm(forms.ModelForm):
             'team_leader',
             'team_members'
         ]
+
+
+class AdvancedRoleSelectionForm(forms.Form):
+    role = forms.ChoiceField(
+        choices=[
+            (Profile.ROLE_ORGANIZER, 'Organizer'),
+            (Profile.ROLE_OWNER, 'Owner'),
+            (Profile.ROLE_PROFESSIONAL, 'Professional'),
+            (Profile.ROLE_GROUP_TEAM, 'Group/Team'),
+        ],
+        widget=forms.RadioSelect,
+        label="Select Your Advanced Role"
+    )

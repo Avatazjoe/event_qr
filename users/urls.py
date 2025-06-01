@@ -14,12 +14,8 @@ urlpatterns = [
     # path('logout/', auth_views.LogoutView.as_view(next_page='event:home'), name='logout'), # Handled at project level
     path('profile/', views.profile, name='profile'), # Changed to function-based view
 
-    path('profile/set-advanced-role/', views.set_advanced_role, name='set_advanced_role'),
     #path('profile/select-role/', views.profile_view, name='profile_view'),
-    path('profile/update/owner/', views.update_owner_profile, name='update_owner_profile'),
-    path('profile/update/organizer/', views.update_organizer_profile, name='update_organizer_profile'),
-    path('profile/update/professional/', views.update_professional_profile, name='update_professional_profile'),
-    path('profile/update/group/', views.update_group_profile, name='update_group_profile'),
+    # Redundant role-specific update URLs removed as new profile view handles this.
 
     path('dashboard/', views.dashboard, name='dashboard'), # Changed to function-based view
     path('user/<str:username>/', views.UserProfileDetailView.as_view(), name='profile_view'),
