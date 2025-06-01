@@ -1,0 +1,54 @@
+<!-- users/profile_display.html -->
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ user.username }}'s Profile{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h1 class="mb-4">{{ user.username }}'s Profile</h1>
+
+  <div class="row">
+    <!-- Profile Card Section -->
+    <div class="col-md-4">
+      <div class="profile-card">
+        {% if user.profile.avatar and user.profile.avatar.url %}
+          <img src="{{ user.profile.avatar.url }}" alt="Avatar" class="avatar">
+        {% else %}
+          <img src="{% static 'images/default_avatar.png' %}" alt="Avatar" class="avatar">
+        {% endif %}
+        <h2>{{ user.get_full_name|default:user.username }}</h2>
+        <p>Email: {{ user.email }}</p>
+        <p>Role: {% if current_role == "user" %}User{% elif current_role == "owner" %}Owner{% elif current_role == "organizer" %}Organizer{% elif current_role == "professional" %}Professional{% elif current_role == "group_team" %}Group/Team{% else %}{{ profile.get_role_display }}{% endif %}</p>
+        {% if profile.bio %}
+          <p>{{ profile.bio }}</p>
+        {% endif %}
+        <a href="{% url 'users:profile_edit' %}" class="btn-edit">Editar Perfil</a>
+        <!-- Change Password button removed as per instruction to follow example -->
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="col-md-8">
+      <p>Welcome to your profile page. You can view your details here and edit them by clicking the "Editar Perfil" button on the left.</p>
+      <p>Your current role is: <strong>{% if current_role == "user" %}User{% elif current_role == "owner" %}Owner{% elif current_role == "organizer" %}Organizer{% elif current_role == "professional" %}Professional{% elif current_role == "group_team" %}Group/Team{% else %}{{ profile.get_role_display }}{% endif %}</strong>.</p>
+
+      <h4 class="mt-4">Quick Actions</h4>
+      <a href="{% url 'password_change' %}" class="btn btn-outline-secondary btn-sm">Change Password</a>
+      <!-- Add other relevant links or information here -->
+
+    </div>
+  </div>
+
+  <!-- Divider -->
+  <hr class="mt-5">
+
+  <!-- Danger Zone -->
+  <div class="mt-4">
+    <h5 class="text-danger">Danger Zone</h5>
+    <p>
+      <button class="btn btn-danger btn-sm" disabled>Delete Account (Coming Soon)</button>
+    </p>
+  </div>
+</div>
+{% endblock %}

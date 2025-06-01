@@ -135,7 +135,17 @@ ROLE_SPECIFIC_FORMS = {
 }
 
 @login_required
-def profile(request):
+def profile_display(request):
+    profile, created = Profile.objects.get_or_create(user=request.user)
+    context = {
+        'profile': profile,
+        'current_role': profile.role,
+    }
+    return render(request, 'users/profile_display.html', context)
+
+
+@login_required
+def profile_edit(request):
     profile, created = Profile.objects.get_or_create(user=request.user)
 
     # Initialize forms to None, they will be set based on context
@@ -146,7 +156,7 @@ def profile(request):
         if 'submit_advanced_role' in request.POST:
             if profile.advanced_role_selected_once:
                 messages.warning(request, "You have already selected an advanced role and cannot change it.")
-                return redirect('users:profile')
+                return redirect('users:profile_display')
             # User is submitting the AdvancedRoleSelectionForm
             advanced_role_form = AdvancedRoleSelectionForm(request.POST)
             if advanced_role_form.is_valid():
@@ -154,7 +164,7 @@ def profile(request):
                 profile.advanced_role_selected_once = True
                 profile.save()
                 messages.success(request, "Role updated successfully!")
-                return redirect('users:profile')
+                return redirect('users:profile_display')
             # If form is invalid, it will be passed to the template below
         else:
             # User is submitting a role-specific profile form
@@ -164,7 +174,7 @@ def profile(request):
                 if role_specific_form.is_valid():
                     role_specific_form.save()
                     messages.success(request, "Profile updated successfully!")
-                    return redirect('users:profile')
+                    return redirect('users:profile_display')
                 # If form is invalid, it will be passed to the template below
             else:
                 # Fallback or error: No specific form for this role or role not set
@@ -172,7 +182,7 @@ def profile(request):
                 messages.error(request, "Error processing profile update.")
                 # Optionally, use a generic form like ProfileForm if appropriate
                 # For now, just redirect or let it fall through to GET
-                return redirect('users:profile')
+                return redirect('users:profile_display')
 
     # GET request or fall-through from invalid POST processing
     current_form = None
@@ -225,6 +235,6 @@ def profile(request):
             not show_role_selection_form # If form isn't shown, button might be
         )
     }
-    return render(request, 'users/profile.html', context)
+    return render(request, 'users/profile_edit.html', context)
 
 
