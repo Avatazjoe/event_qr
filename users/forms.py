@@ -131,5 +131,6 @@ class AdvancedRoleSelectionForm(forms.Form):
             (Profile.ROLE_GROUP_TEAM, 'Group/Team'),
         ],
         widget=forms.RadioSelect,
-        label="Select Your Advanced Role"
+        label="Select Your Advanced Role",
+        required=True
     )
