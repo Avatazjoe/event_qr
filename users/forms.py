@@ -1,6 +1,10 @@
+# users/forms.py
+
 from django import forms
 from django.contrib.auth.models import User
-from .models import UserProfile, Profile # Added Profile import
+from .models import Profile  # Solo Profile, ya no UserProfile
+from phonenumber_field.formfields import PhoneNumberField
+
 
 class UserRegistrationForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)
@@ -25,12 +29,94 @@ class UserRegistrationForm(forms.ModelForm):
             raise forms.ValidationError("Passwords don't match")
         return password_confirm
 
-class UserProfileForm(forms.ModelForm):
-    class Meta:
-        model = UserProfile
-        fields = ['profile_picture', 'bio', 'phone_number']
 
 class ProfileForm(forms.ModelForm):
+    phone_number = PhoneNumberField(
+        label='Phone Number',
+        required=False
+    )
+
     class Meta:
         model = Profile
-        fields = ['avatar', 'bio']
+        fields = ['avatar', 'bio', 'phone_number']
+
+
+# === Formularios específicos por rol ===
+
+class OwnerProfileForm(forms.ModelForm):
+    phone_number = PhoneNumberField(
+        label='Phone Number',
+        required=False
+    )
+
+    class Meta:
+        model = Profile
+        fields = [
+            'avatar',
+            'bio',
+            'phone_number',
+            'venue_name',
+            'opening_hours',
+            'capacity',
+            'gallery',
+            'menu',
+            'drink_menu',
+            'rental_price'
+        ]
+
+
+class OrganizerProfileForm(forms.ModelForm):
+    phone_number = PhoneNumberField(
+        label='Phone Number',
+        required=False
+    )
+
+    class Meta:
+        model = Profile
+        fields = [
+            'avatar',
+            'bio',
+            'phone_number',
+            'organizer_description'
+        ]
+
+
+class ProfessionalProfileForm(forms.ModelForm):
+    phone_number = PhoneNumberField(
+        label='Phone Number',
+        required=False
+    )
+
+    class Meta:
+        model = Profile
+        fields = [
+            'avatar',
+            'bio',
+            'phone_number',
+            'specialization',
+            'portfolio_url',
+            'availability'
+        ]
+
+
+class GroupProfileForm(forms.ModelForm):
+    phone_number = PhoneNumberField(
+        label='Phone Number',
+        required=False
+    )
+    team_members = forms.ModelMultipleChoiceField(
+        queryset=User.objects.all(),
+        required=False,
+        widget=forms.SelectMultiple(attrs={'class': 'form-control'})
+    )
+
+    class Meta:
+        model = Profile
+        fields = [
+            'avatar',
+            'bio',
+            'phone_number',
+            'team_name',
+            'team_leader',
+            'team_members'
+        ]

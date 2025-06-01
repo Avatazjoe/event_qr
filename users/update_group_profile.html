@@ -1,0 +1,13 @@
+<!-- templates/users/update_group_profile.html -->
+{% extends "base.html" %}
+{% block title %}Update Group Profile{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Update Group Info</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">Save</button>
+    </form>
+</div>
+{% endblock %}

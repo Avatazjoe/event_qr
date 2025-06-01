@@ -1,46 +1,65 @@
 <!-- users/profile.html -->
 {% extends "base.html" %}
-{% load static %} <!-- Ensuring static is loaded -->
+{% load static %}
+
 {% block title %}Your Profile{% endblock %}
 
 {% block content %}
-<div class="container mt-4"> <!-- Assuming .container class is for general layout -->
-  <h1>Your Profile</h1>
+<div class="container mt-4">
+  <h1 class="mb-4">Your Profile</h1>
 
   <div class="row">
+    <!-- Profile Card -->
     <div class="col-md-4">
       <div class="card text-center">
         {% if user.profile.avatar %}
-          <img src="{{ user.profile.avatar.url }}" class="card-img-top rounded-circle mx-auto mt-3" alt="Profile Picture" style="width: 150px; height: 150px; object-fit: cover;">
+          <img src="{{ user.profile.avatar.url }}" alt="Profile Picture"
+               class="card-img-top rounded-circle mx-auto mt-3"
+               style="width: 150px; height: 150px; object-fit: cover;">
         {% else %}
-          <img src="{% static 'images/default_avatar.png' %}" class="card-img-top rounded-circle mx-auto mt-3" alt="Default Profile Picture" style="width: 150px; height: 150px; object-fit: cover;"> <!-- Placeholder for default avatar -->
+          <img src="{% static 'images/default_avatar.png' %}" alt="Default Avatar"
+               class="card-img-top rounded-circle mx-auto mt-3"
+               style="width: 150px; height: 150px; object-fit: cover;">
         {% endif %}
         <div class="card-body">
           <h5 class="card-title">{{ user.get_full_name|default:user.username }}</h5>
           <p class="card-text">{{ user.email }}</p>
-          {% if user.profile.get_role_display %} {# Check if role exists and has a display value #}
-              <p class="card-text"><strong>Role:</strong> {{ user.profile.get_role_display }}</p>
+
+          {% if user.profile.get_role_display %}
+            <p class="card-text mb-1"><strong>Role:</strong> {{ user.profile.get_role_display }}</p>
+
+            <!-- Role Upgrade Button -->
+            <form method="post" action="{% url 'users:set_advanced_role' %}" class="d-inline">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-sm btn-outline-primary mt-1">Elegir Rol Avanzado</button>
+            </form>
           {% endif %}
-          <a href="{% url 'password_change' %}" class="btn btn-outline-secondary btn-sm">Change Password</a>
+
+          <a href="{% url 'password_change' %}" class="btn btn-outline-secondary btn-sm mt-2">Change Password</a>
         </div>
       </div>
     </div>
 
+    <!-- Edit Profile Form -->
     <div class="col-md-8">
       <h4>Edit Profile</h4>
-      <form method="post" enctype="multipart/form-data">
+      <form method="post" enctype="multipart/form-data" class="mt-3">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
+        <button type="submit" class="btn btn-primary mt-2">Save Changes</button>
       </form>
     </div>
   </div>
 
-  <hr class="mt-4">
+  <!-- Divider -->
+  <hr class="mt-5">
 
-  <div class="mt-3">
-    <h5>Danger Zone</h5>
-    <p><a href="#" class="btn btn-danger btn-sm">Delete Account (Coming Soon)</a></p> <!-- Delete account functionality not yet implemented -->
+  <!-- Danger Zone -->
+  <div class="mt-4">
+    <h5 class="text-danger">Danger Zone</h5>
+    <p>
+      <button class="btn btn-danger btn-sm" disabled>Delete Account (Coming Soon)</button>
+    </p>
   </div>
 </div>
 {% endblock %}

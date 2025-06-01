@@ -32,7 +32,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = ""
+SECRET_KEY = "django-insecure-(r8o2evi++2dtf%d+-tl(t2^*g_(t^$*@n4rl!v+f-lizq726$"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -138,5 +138,5 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Authentication URLs
 LOGIN_URL = 'users:login'
-LOGIN_REDIRECT_URL = 'landing_page_root' # Or '/' if you prefer direct paths
-LOGOUT_REDIRECT_URL = 'landing_page_root' # Or '/'
+LOGIN_REDIRECT_URL = '/' # Or '/' if you prefer direct paths
+LOGOUT_REDIRECT_URL = '/' # Or '/'

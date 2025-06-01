@@ -1,10 +1,40 @@
-{% extends 'base.html' %}
-
+<!-- templates/users/profile.html -->
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Profile{% endblock %}
 {% block content %}
-  <h2>Profile</h2>
-  <form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Save Profile</button>
-  </form>
+<div class="container mt-5">
+    <h2>Your Profile</h2>
+
+    <p><strong>Username:</strong> {{ request.user.username }}</p>
+    <p><strong>Email:</strong> {{ request.user.email }}</p>
+    <p><strong>Role:</strong> {{ request.user.profile.get_role_display }}</p>
+
+    {% if request.user.profile.role == 'user' %}
+        <div class="alert alert-info">
+            <p>You are currently registered as a basic user.</p>
+            <p>Select a role to complete your profile:</p>
+
+            <form method="post" action="{% url 'set_advanced_role' %}">
+                {% csrf_token %}
+                <select name="role" id="id_role" class="form-control mb-3" onchange="this.form.submit()">
+                    <option value="">-- Select Role --</option>
+                    {% for value, label in request.user.profile.USER_ROLE_CHOICES %}
+                        {% if value != 'user' %}
+                            <option value="{{ value }}">{{ label }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-success">Actualizar Rol</button>  <!-- opcional si tienes onchange -->
+            </form>
+        </div>
+    {% else %}
+        <div class="alert alert-success">
+            You are registered as: <strong>{{ request.user.profile.get_role_display }}</strong>
+        </div>
+    {% endif %}
+
+    <!-- Botón para editar perfil básico -->
+    <a href="{% url 'users:profile_update' %}" class="btn btn-primary">Edit Basic Profile</a>
+</div>
 {% endblock %}
