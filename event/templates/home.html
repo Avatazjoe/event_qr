@@ -3,21 +3,35 @@
 {% block title %}Eventos{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h1 class="mb-4">Eventos</h1>
-    <div class="row">
-        {% for evento in eventos %}
-            <div class="col-md-4 mb-4">
-                <div class="card">
-                    <img src="{{ evento.imagen.url }}" class="card-img-top" alt="{{ evento.nombre }}">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ evento.nombre }}</h5>
-                        <p class="card-text">{{ evento.fecha }}</p>
-                        <a href="{% url 'evento_detalle' evento.id %}" class="btn btn-primary">Ver detalles</a>
-                    </div>
+{# Top bar with search and filters - mimicking CodePen structure #}
+<div class="d-flex flex-wrap justify-content-between align-items-center mt-4 mb-3">
+  <div class="search-bar flex-grow-1 me-3">
+    <input type="text" class="form-control border-0 bg-transparent text-white" placeholder="Buscar eventos...">
+  </div>
+  {# Assuming these buttons are part of the CodePen aesthetic #}
+  <button class="btn btn-outline-light me-2">Filtros</button>
+  <button class="btn btn-outline-light">Ordenar</button> {# Example: Added an order button #}
+</div>
+
+<div class="row">
+    {% for evento in eventos %}
+        <div class="col-md-4 mb-4">
+            {# Changed card class to card-custom #}
+            <div class="card card-custom">
+                {% if evento.imagen %}
+                <img src="{{ evento.imagen.url }}" class="card-img-top" alt="{{ evento.nombre }}">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ evento.nombre }}</h5>
+                    <p class="card-text">{{ evento.fecha|date:"d M Y, H:i" }}</p> {# Added date formatting #}
+                    <a href="{% url 'evento_detalle' evento.id %}" class="btn btn-primary">Ver detalles</a>
                 </div>
             </div>
-        {% endfor %}
-    </div>
+        </div>
+    {% empty %}
+        <div class="col">
+            <p>No hay eventos disponibles en este momento.</p>
+        </div>
+    {% endfor %}
 </div>
 {% endblock %}
